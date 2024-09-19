@@ -15,6 +15,10 @@ type Server struct {
 	e    *queue.Exchange
 }
 
+type Handler struct {
+	e *queue.Exchange
+}
+
 func NewServer(addr string, exchange *queue.Exchange) *Server {
 	router := chi.NewRouter()
 
@@ -27,13 +31,20 @@ func NewServer(addr string, exchange *queue.Exchange) *Server {
 }
 
 func (s *Server) HandleRoutes() {
+	h := &Handler{
+		e: s.e,
+	}
 	s.r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Home"))
 	})
 
-	s.r.Get("/topics", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("topics"))
-	})
+	// Get the list of available topics
+	s.r.Get("/topics", h.GetTopics)
+	// Create a New Topic
+	s.r.Post("/topic", h.CreateTopic)
+	// Publish message to a Topic
+	s.r.Post("/pub", h.PublishMessage)
+
 }
 
 func (s *Server) Run() {

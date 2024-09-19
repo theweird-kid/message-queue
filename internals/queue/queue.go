@@ -42,13 +42,15 @@ func (e *Exchange) CreateTopic(name string, buffSize int) {
 }
 
 // Publish Message to a Topic
-func (e *Exchange) Publish(topicName string, msg Message) {
+func (e *Exchange) Publish(topicName string, msg Message) error {
 	e.mu.RLock()
 	defer e.mu.RUnlock()
 	if topic, exists := e.Topics[topicName]; exists {
 		topic.Channel <- msg
+		fmt.Printf("Message %v Published to topic %s\n", msg, topicName)
+		return nil
 	} else {
-		fmt.Printf("Topic %s does not exist\n", topicName)
+		return fmt.Errorf("Topic %s does not exist", topicName)
 	}
 }
 
