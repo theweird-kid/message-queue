@@ -3,8 +3,10 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
+	"github.com/go-chi/chi"
 	"github.com/theweird-kid/message-queue/internals/queue"
 	"github.com/theweird-kid/message-queue/utils"
 )
@@ -60,3 +62,8 @@ func (h *Handler) PublishMessage(w http.ResponseWriter, r *http.Request) {
 }
 
 // Handler to Get message from topic
+func (h *Handler) GetMessages(w http.ResponseWriter, r *http.Request) {
+	// Extract topic from request
+	topic := chi.URLParam(r, "topic")
+	log.Println(h.e.Subscribe(topic))
+}
